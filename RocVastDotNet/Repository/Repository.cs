@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using RocVastDotNet.Context;
+using RocVastDotNet.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +23,11 @@ namespace RocVastDotNet.Repository
             return await Context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
             return await Context.Set<T>().FindAsync(id);
         }
+
 
         public async Task AddAsync(T entity)
         {

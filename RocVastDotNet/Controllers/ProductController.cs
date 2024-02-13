@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RocVastDotNet.Context;
 using RocVastDotNet.Interfaces;
 using RocVastDotNet.Models;
 
@@ -13,76 +15,46 @@ namespace RocVastDotNet.Controllers
     [Route("api/[controller]")]
     public class ProductController : Controller
     {
-        private readonly IRepository<Product> _repository;
+        private readonly ProductContext _context;
 
-        public ProductsController(IRepository<Product> repository)
+        public ProductController(ProductContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         // GET: api/values
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get()
         {
-            try
-            {
-                var products = await _repository.GetAllAsync();
-                return Ok(products);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception details here as needed
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
+            return Ok(await _context.Product.ToListAsync());
         }
 
-        // GET api/values/5
+        [HttpGet("{id}", Name = "GetProduct")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
+            var product = await _context.Product.FindAsync(id);
+
+            if (product == null)
             {
-                var product = await _repository.GetByIdAsync(id);
-                if (product == null)
-                {
-                    return NotFound();
-                }
-                return Ok(product);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception details here as needed
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
+
+            return Ok(product);
         }
 
         // POST api/values
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Product product)
+        public async Task<IActionResult> Create([FromBody] Product product)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (product == null)
-                {
-                    return BadRequest("Product object is null");
-                }
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest("Invalid model object");
-                }
+                return BadRequest(ModelState);
+            }
 
-                await _repository.AddAsync(product);
-                return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception details here as needed
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
+            _context.Product.Add(product);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
         }
-
-        // Additional methods for UPDATE and DELETE could follow a similar structure
-        // Ensure to implement the corresponding methods in your IRepository<T> and Repository<T> as necessary
     }
 }
-}
-

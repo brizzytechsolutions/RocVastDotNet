@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RocVastDotNet.Models;
-using System.Collections.Generic;
 
 namespace RocVastDotNet.Context
 {
@@ -10,6 +9,14 @@ namespace RocVastDotNet.Context
         {
         }
 
-        public DbSet<Product> Products { get; set; }
+        public DbSet<Product> Product { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Product>().ToTable("product");
+        }
     }
 }
