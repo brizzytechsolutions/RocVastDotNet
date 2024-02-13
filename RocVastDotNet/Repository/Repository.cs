@@ -26,32 +26,10 @@ namespace RocVastDotNet.Repository
             return await Context.Set<T>().FindAsync(id);
         }
 
-        public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await Context.Set<T>().FirstOrDefaultAsync(predicate);
-        }
-
         public async Task AddAsync(T entity)
         {
             await Context.Set<T>().AddAsync(entity);
             await Context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(T entity)
-        {
-            Context.Set<T>().Update(entity);
-            await Context.SaveChangesAsync();
-        }
-
-        public async Task RemoveAsync(T entity)
-        {
-            Context.Set<T>().Remove(entity);
-            await Context.SaveChangesAsync();
-        }
-
-        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
-        {
-            return Context.Set<T>().Where(predicate);
         }
     }
 }
